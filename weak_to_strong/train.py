@@ -10,6 +10,10 @@ import numpy as np
 import torch
 import torch_optimizer as toptim
 from transformers.modeling_utils import load_sharded_checkpoint
+from tranformers import TrainingArguments
+from peft import LoraConfig
+from trl import SFTTRainer
+
 
 import weak_to_strong.logger as logger
 from weak_to_strong.common import clear_mem
@@ -27,6 +31,58 @@ class ModelConfig:
     gradient_checkpointing: bool = False
     model_parallel: bool = False
     default_optimizer: str = "adam"
+
+def train_lora(
+    model: torch.nn.Module,
+    ds: datasets.Dataset,
+    batch_size: int,
+    lr: float = 1e-5,
+    loss_fn: Callable = xent_loss,
+    log_every: int = 10,
+    eval_every: int = 100,
+    eval_batch_size: int = 256,
+    minibatch_size: int = 8,
+    eval_ds: Optional[datasets.Dataset] = None,
+    gradient_checkpointing: bool = False,
+    train_with_dropout: bool = False,
+    epochs: int = 1,
+    lr_schedule: str = "cosine_anneal",
+    optimizer_name: str = "adam",
+):
+    lora_config = LoraConfig(
+        r=8,
+        target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
+        task_type="SEQ_CLS",
+    )
+
+    trainer = SFTTrainer(
+    model=model,
+    train_dataset=ds["train"],
+    args=TrainingArguments(
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=eval_batch_size,
+        # gradient_accumulation_steps=4,
+        # warmup_steps=2,
+        # max_steps=10,
+        gradient_checkpointing=gradient_checkpointing,
+        num_train_epochs=epochs,
+        learning_rate=lr,
+        lr_scheduler_type=lr_schedule,
+        logging_steps=log_every,
+        eval_strategy='steps',
+        eval_steps=eval_every,
+        fp16=True,
+        logging_steps=1,
+        output_dir="outputs",
+        optim=optimizer_name.lower()
+    ),
+    peft_config=lora_config,
+    )
+
+
+    
+
+    
 
 
 def train_model(
