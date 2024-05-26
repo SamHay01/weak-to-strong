@@ -283,13 +283,10 @@ def train_and_save_model(
         target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
         task_type="SEQ_CLS",
         )
-
         model = TransformerWithHead.from_pretrained(
-            model_config.name, num_labels=2, linear_probe=linear_probe, **custom_kwargs
+            model_config.name, num_labels=2, linear_probe=linear_probe,lora_config=lora_config, **custom_kwargs
         ).to("cuda")
 
-        lora_model = get_peft_model(model, lora_config)
-        model = lora_model
         already_trained = maybe_load_model(model)
         minibatch_size = min(minibatch_size_per_device * torch.cuda.device_count(), batch_size)
         if torch.cuda.device_count() > 1:
