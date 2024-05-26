@@ -8,6 +8,7 @@ import fire
 import numpy as np
 import torch
 from datasets import load_dataset, load_from_disk
+from transformers import BitsAndBytesConfig
 
 import weak_to_strong.logger as logger
 from weak_to_strong.common import get_tokenizer
@@ -107,6 +108,32 @@ MODEL_CONFIGS = [
         # Note that even then it will take up ~60GB per GPU on an 8-GPU machine.
         default_optimizer="adafactor",
     ),
+    ModelConfig(
+        name="google/Gemma-2b",
+        default_lr=5e-5,
+        eval_batch_size=32,
+        lora=True,
+        custom_kwargs={
+            "quantization_config": BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_compute_dtype=torch.bfloat16
+            )
+        }
+    ),
+    ModelConfig(
+        name="google-bert/bert-base-cased",
+        default_lr=5e-5,
+        eval_batch_size=32,
+        lora=True,
+        custom_kwargs={
+            "quantization_config": BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_compute_dtype=torch.bfloat16
+            )
+        }
+    )
 ]
 MODELS_DICT: Dict[str, ModelConfig] = {
     model_config.name: model_config for model_config in MODEL_CONFIGS
