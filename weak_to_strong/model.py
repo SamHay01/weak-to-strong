@@ -24,7 +24,7 @@ class TransformerWithHead(PreTrainedModel):
             lm = get_peft_model(lm, lora_config)
             
         self.lm = lm
-        if name == "google/Gemma-2b"':
+        if name == "google/Gemma-2b":
             self.transformer = lm.model.embed_tokens
         else:
             self.transformer = lm.transformer
