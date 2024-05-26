@@ -10,10 +10,7 @@ import numpy as np
 import torch
 import torch_optimizer as toptim
 from transformers.modeling_utils import load_sharded_checkpoint
-from tranformers import TrainingArguments
 from peft import LoraConfig, get_lora_model
-from trl import SFTTRainer
-
 
 import weak_to_strong.logger as logger
 from weak_to_strong.common import clear_mem
