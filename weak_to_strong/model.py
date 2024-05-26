@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import torch
-from transformers import AutoConfig, AutoModelForCausalLM, PreTrainedModel
+from transformers import AutoConfig, AutoModelForCausalLM, PreTrainedModel, GemmaForCausalLM
 
 
 @dataclass
@@ -20,7 +20,10 @@ class TransformerWithHead(PreTrainedModel):
         self.num_labels = config.num_labels
         lm = AutoModelForCausalLM.from_pretrained(name, **kwargs)
         self.lm = lm
-        self.transformer = lm.transformer
+        if isinstance(lm, GemmaForCausalLM):
+            self.transformer = lm.model
+        else:
+            self.transformer = lm.transformer
         hidden_size = getattr(config, "n_embd", getattr(config, "hidden_size", None))
         self.score = torch.nn.Linear(hidden_size, self.num_labels, bias=False).to(
             lm.lm_head.weight.dtype
