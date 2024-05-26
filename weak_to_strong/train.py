@@ -11,7 +11,7 @@ import torch
 import torch_optimizer as toptim
 from transformers.modeling_utils import load_sharded_checkpoint
 from tranformers import TrainingArguments
-from peft import LoraConfig
+from peft import LoraConfig, get_lora_model
 from trl import SFTTRainer
 
 
@@ -31,7 +31,9 @@ class ModelConfig:
     gradient_checkpointing: bool = False
     model_parallel: bool = False
     default_optimizer: str = "adam"
+    lora: bool = False
 
+"""
 def train_lora(
     model: torch.nn.Module,
     ds: datasets.Dataset,
@@ -57,7 +59,8 @@ def train_lora(
 
     trainer = SFTTrainer(
     model=model,
-    train_dataset=ds["train"],
+    train_dataset=ds,
+    eval_dataset=eval_ds,
     args=TrainingArguments(
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=eval_batch_size,
@@ -78,12 +81,7 @@ def train_lora(
     ),
     peft_config=lora_config,
     )
-
-
-    
-
-    
-
+"""
 
 def train_model(
     model: torch.nn.Module,
@@ -281,6 +279,33 @@ def train_and_save_model(
         already_trained = maybe_load_model(model)
         # slight misnomer, more like minibatch_size_per_dp_replica
         minibatch_size = minibatch_size_per_device
+    elif model_config.lora:
+        print('using lora model')
+        lora_config = LoraConfig(
+        r=8,
+        target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
+        task_type="SEQ_CLS",
+        )
+
+        model = TransformerWithHead.from_pretrained(
+            model_config.name, num_labels=2, linear_probe=linear_probe, **custom_kwargs
+        ).to("cuda")
+
+        lora_model = get_lora_model(model, lora_config)
+        model = lora_model
+        already_trained = maybe_load_model(model)
+        minibatch_size = min(minibatch_size_per_device * torch.cuda.device_count(), batch_size)
+        if torch.cuda.device_count() > 1:
+            model = torch.nn.DataParallel(model, output_device=0)
+            print(
+                "Using",
+                torch.cuda.device_count(),
+                "GPUs, setting minibatch_size to",
+                minibatch_size,
+            )
+        else:
+            minibatch_size = minibatch_size_per_device
+
     else:
         model = TransformerWithHead.from_pretrained(
             model_config.name, num_labels=2, linear_probe=linear_probe, **custom_kwargs
