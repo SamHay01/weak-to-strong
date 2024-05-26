@@ -28,6 +28,8 @@ class TransformerWithHead(PreTrainedModel):
             if not os.path.isfile(peft_path):
                 lm.save_pretrained(f'peft_models/{name}')
             config = PeftConfig.from_pretrained(peft_path)
+            print(config)
+            assert False
             
         self.lm = lm
         if isinstance(lm, PeftModel):
