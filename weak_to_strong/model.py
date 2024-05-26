@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import torch
 from transformers import AutoConfig, AutoModelForCausalLM, PreTrainedModel, GemmaForCausalLM
-
+from peft import get_peft_model
 
 @dataclass
 class HeadOutput:
@@ -14,11 +14,13 @@ class TransformerWithHead(PreTrainedModel):
     This class initializes the linear head to zeros
     """
 
-    def __init__(self, name, linear_probe=False, **kwargs):
+    def __init__(self, name, linear_probe=False, lora_config=None, **kwargs):
         config = AutoConfig.from_pretrained(name, **kwargs)
         super().__init__(config)
         self.num_labels = config.num_labels
         lm = AutoModelForCausalLM.from_pretrained(name, **kwargs)
+        if lora_config is not None:
+            lm = get_peft_model(lm, lora_config)
         self.lm = lm
         if isinstance(lm, GemmaForCausalLM):
             self.transformer = lm.model
