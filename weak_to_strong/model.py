@@ -27,6 +27,8 @@ class TransformerWithHead(PreTrainedModel):
         else:
             self.transformer = lm.transformer
         hidden_size = getattr(config, "n_embd", getattr(config, "hidden_size", None))
+        print(f'hidden_size' = {hidden_size})
+        assert False
         self.score = torch.nn.Linear(hidden_size, self.num_labels, bias=False).to(
             lm.lm_head.weight.dtype
         )
