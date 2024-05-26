@@ -10,7 +10,7 @@ import numpy as np
 import torch
 import torch_optimizer as toptim
 from transformers.modeling_utils import load_sharded_checkpoint
-from peft import LoraConfig, get_lora_model
+from peft import LoraConfig, get_peft_model
 
 import weak_to_strong.logger as logger
 from weak_to_strong.common import clear_mem
@@ -288,7 +288,7 @@ def train_and_save_model(
             model_config.name, num_labels=2, linear_probe=linear_probe, **custom_kwargs
         ).to("cuda")
 
-        lora_model = get_lora_model(model, lora_config)
+        lora_model = get_peft_model(model, lora_config)
         model = lora_model
         already_trained = maybe_load_model(model)
         minibatch_size = min(minibatch_size_per_device * torch.cuda.device_count(), batch_size)

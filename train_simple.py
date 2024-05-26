@@ -196,7 +196,7 @@ def main(
     # Set to a very large value so that by default we don't do any intermediate evals but
     # still do final evals (which requires eval_every to be set to a non-zero, non-None value)
     eval_every: int = 1000000,
-    sync_command: Optional[str] = None,
+    sync_command: Optional[str] = None
 ):
     # this is per device!
     if minibatch_size_per_device is None:
