@@ -281,7 +281,7 @@ def train_and_save_model(
         lora_config = LoraConfig(
         r=8,
         target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
-        task_type="SEQ_CLS",
+        task_type="CAUSAL_LM",
         )
         model = TransformerWithHead.from_pretrained(
             model_config.name, num_labels=2, linear_probe=linear_probe,lora_config=lora_config, **custom_kwargs

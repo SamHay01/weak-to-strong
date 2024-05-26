@@ -22,18 +22,10 @@ class TransformerWithHead(PreTrainedModel):
         lm = AutoModelForCausalLM.from_pretrained(name, **kwargs)
         if lora_config is not None:
             lm = get_peft_model(lm, lora_config)
-            peft_path = f'peft_models/{name}'
-            if not os.path.isdir('peft_models'):
-                os.mkdir('peft_models')
-            if not os.path.isfile(peft_path):
-                lm.save_pretrained(f'peft_models/{name}')
-            config = PeftConfig.from_pretrained(peft_path)
-            print(config)
-            assert False
             
         self.lm = lm
-        if isinstance(lm, PeftModel):
-            self.transformer = lm.model
+        if name == "google/Gemma-2b"':
+            self.transformer = lm.model.embed_tokens
         else:
             self.transformer = lm.transformer
         hidden_size = getattr(config, "n_embd", getattr(config, "hidden_size", None))
