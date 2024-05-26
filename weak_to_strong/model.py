@@ -1,8 +1,9 @@
 from dataclasses import dataclass
+import os
 
 import torch
 from transformers import AutoConfig, AutoModelForCausalLM, PreTrainedModel, GemmaForCausalLM
-from peft import get_peft_model, PeftModel
+from peft import get_peft_model, PeftModel, PeftConfig
 
 @dataclass
 class HeadOutput:
@@ -21,14 +22,19 @@ class TransformerWithHead(PreTrainedModel):
         lm = AutoModelForCausalLM.from_pretrained(name, **kwargs)
         if lora_config is not None:
             lm = get_peft_model(lm, lora_config)
+            peft_path = f'peft_models/{name}')
+            if not os.path.isdir('peft_models'):
+                os.mkdir('peft_models')
+            if not os.path.isfile(peft_path):
+                lm.save_pretrained(f'peft_models/{name}')
+            config = PeftConfig.from_pretrained(peft_path)
+            
         self.lm = lm
         if isinstance(lm, PeftModel):
             self.transformer = lm.model
         else:
             self.transformer = lm.transformer
         hidden_size = getattr(config, "n_embd", getattr(config, "hidden_size", None))
-        print(f'hidden_size = {hidden_size}')
-        assert False
         self.score = torch.nn.Linear(hidden_size, self.num_labels, bias=False).to(
             lm.lm_head.weight.dtype
         )
@@ -60,7 +66,6 @@ class TransformerWithHead(PreTrainedModel):
         hidden_states = torch.stack(
             [transformer_outputs[0][i, input_lens[i] - 1, :] for i in range(len(input_lens))]
         )
-        print(f'hidden states shape = {hidden_states.shape}')
         self.score.to(hidden_states.device)
         if self.linear_probe:
             hidden_states = hidden_states.detach()
