@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import torch
 from transformers import AutoConfig, AutoModelForCausalLM, PreTrainedModel, GemmaForCausalLM
-from peft import get_peft_model
+from peft import get_peft_model, PeftModel
 
 @dataclass
 class HeadOutput:
@@ -22,7 +22,7 @@ class TransformerWithHead(PreTrainedModel):
         if lora_config is not None:
             lm = get_peft_model(lm, lora_config)
         self.lm = lm
-        if isinstance(lm, GemmaForCausalLM):
+        if isinstance(lm, PeftModel):
             self.transformer = lm.model
         else:
             self.transformer = lm.transformer
