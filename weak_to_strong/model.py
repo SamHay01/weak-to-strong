@@ -58,6 +58,7 @@ class TransformerWithHead(PreTrainedModel):
         hidden_states = torch.stack(
             [transformer_outputs[0][i, input_lens[i] - 1, :] for i in range(len(input_lens))]
         )
+        print(f'hidden states shape = {hidden_states.shape}')
         self.score.to(hidden_states.device)
         if self.linear_probe:
             hidden_states = hidden_states.detach()
