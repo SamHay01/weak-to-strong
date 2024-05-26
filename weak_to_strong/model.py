@@ -22,7 +22,7 @@ class TransformerWithHead(PreTrainedModel):
         lm = AutoModelForCausalLM.from_pretrained(name, **kwargs)
         if lora_config is not None:
             lm = get_peft_model(lm, lora_config)
-            peft_path = f'peft_models/{name}')
+            peft_path = f'peft_models/{name}'
             if not os.path.isdir('peft_models'):
                 os.mkdir('peft_models')
             if not os.path.isfile(peft_path):
