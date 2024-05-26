@@ -34,8 +34,8 @@ class TransformerWithHead(PreTrainedModel):
         self.linear_probe = linear_probe
 
     @classmethod
-    def from_pretrained(cls, name, **kwargs):
-        return cls(name, **kwargs)
+    def from_pretrained(cls, name, lora_config=None, **kwargs):
+        return cls(name, lora_config=lora_config,**kwargs)
 
     def gradient_checkpointing_enable(self):
         model = self.transformer
