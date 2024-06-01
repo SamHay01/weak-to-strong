@@ -26,6 +26,8 @@ class TransformerWithHead(PreTrainedModel):
         self.lm = lm
         if name == "google/Gemma-2b":
             self.transformer = lm.model.model.embed_tokens
+        elif name=="google-bert/bert-base-cased":
+            self.transformer = lm.bert
         else:
             self.transformer = lm.transformer
         hidden_size = getattr(config, "n_embd", getattr(config, "hidden_size", None))
