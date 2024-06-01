@@ -29,7 +29,7 @@ class TransformerWithHead(PreTrainedModel):
             head_dtype = lm.lm_head.weight.dtype
         elif name=="google-bert/bert-base-cased":
             self.transformer = lm.bert
-            head_dtype = lm.cls.predictions.weight.dtype
+            head_dtype = lm.cls.predictions.decoder.weight.dtype
         else:
             self.transformer = lm.transformer
             head_dtype = lm.lm_head.weight.dtype
