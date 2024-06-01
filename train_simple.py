@@ -9,6 +9,7 @@ import numpy as np
 import torch
 from datasets import load_dataset, load_from_disk
 from transformers import BitsAndBytesConfig
+from peft import LoraConfig
 
 import weak_to_strong.logger as logger
 from weak_to_strong.common import get_tokenizer
@@ -112,7 +113,11 @@ MODEL_CONFIGS = [
         name="google/Gemma-2b",
         default_lr=5e-5,
         eval_batch_size=32,
-        lora=True,
+        lora_config=LoraConfig(
+        r=8,
+        target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
+        task_type="CAUSAL_LM",
+        ),
         custom_kwargs={
             "quantization_config": BitsAndBytesConfig(
                     load_in_4bit=True,
@@ -125,7 +130,9 @@ MODEL_CONFIGS = [
         name="google-bert/bert-base-cased",
         default_lr=5e-5,
         eval_batch_size=32,
-        lora=True,
+        lora_config = LoraConfig(
+    task_type='CAUSAL_LM', r=1, lora_alpha=1, lora_dropout=0.1
+                ),
         custom_kwargs={
             "quantization_config": BitsAndBytesConfig(
                     load_in_4bit=True,

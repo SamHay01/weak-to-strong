@@ -28,7 +28,7 @@ class ModelConfig:
     gradient_checkpointing: bool = False
     model_parallel: bool = False
     default_optimizer: str = "adam"
-    lora: bool = False
+    lora_config = None
 
 """
 def train_lora(
@@ -276,15 +276,10 @@ def train_and_save_model(
         already_trained = maybe_load_model(model)
         # slight misnomer, more like minibatch_size_per_dp_replica
         minibatch_size = minibatch_size_per_device
-    elif model_config.lora:
+    elif model_config.lora_config is not None:
         print('using lora model')
-        lora_config = LoraConfig(
-        r=8,
-        target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
-        task_type="CAUSAL_LM",
-        )
         model = TransformerWithHead.from_pretrained(
-            model_config.name, num_labels=2, linear_probe=linear_probe,lora_config=lora_config, **custom_kwargs
+            model_config.name, num_labels=2, linear_probe=linear_probe,lora_config=model_config.lora_config, **custom_kwargs
         ).to("cuda")
 
         already_trained = maybe_load_model(model)
