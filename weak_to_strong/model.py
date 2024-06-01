@@ -62,7 +62,7 @@ class TransformerWithHead(PreTrainedModel):
         """
         input_lens = (input_ids != 0).sum(dim=-1)
         transformer_outputs = self.transformer(input_ids)
-        print(f'output shape = {transformer_outputs.shape}')
+        # print(f'output shape = {transformer_outputs.shape}')
         hidden_states = torch.stack(
             [transformer_outputs[0][i, input_lens[i] - 1, :] for i in range(len(input_lens))]
         )
