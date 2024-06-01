@@ -26,13 +26,16 @@ class TransformerWithHead(PreTrainedModel):
         self.lm = lm
         if name == "google/Gemma-2b":
             self.transformer = lm.model.model.embed_tokens
+            head_dtype = lm.lm_head.weight.dtype
         elif name=="google-bert/bert-base-cased":
             self.transformer = lm.bert
+            head_dtype = lm.cls.weight.dtype
         else:
             self.transformer = lm.transformer
+            head_dtype = lm.lm_head.weight.dtype
         hidden_size = getattr(config, "n_embd", getattr(config, "hidden_size", None))
         self.score = torch.nn.Linear(hidden_size, self.num_labels, bias=False).to(
-            lm.lm_head.weight.dtype
+            head_dtype
         )
         torch.nn.init.normal_(self.score.weight, std=0.0)
         self.linear_probe = linear_probe
