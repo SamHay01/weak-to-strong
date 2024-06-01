@@ -28,7 +28,7 @@ class ModelConfig:
     gradient_checkpointing: bool = False
     model_parallel: bool = False
     default_optimizer: str = "adam"
-    lora_config = None
+    lora_config: LoraConfig = None
 
 """
 def train_lora(
