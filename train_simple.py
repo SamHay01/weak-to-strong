@@ -110,7 +110,7 @@ MODEL_CONFIGS = [
         default_optimizer="adafactor",
     ),
     ModelConfig(
-        name="google/Gemma-2b",
+        name="google/gemma-2b",
         default_lr=5e-5,
         eval_batch_size=32,
         lora_config=LoraConfig(
@@ -130,7 +130,7 @@ MODEL_CONFIGS = [
         name="google-bert/bert-base-cased",
         default_lr=5e-5,
         eval_batch_size=32,
-        lora_config = LoraConfig(task_type='CAUSAL_LM', r=8),
+        lora_config=LoraConfig(task_type='CAUSAL_LM', r=8),
         custom_kwargs={
             "quantization_config": BitsAndBytesConfig(
                     load_in_4bit=True,
