@@ -70,7 +70,7 @@ class TransformerWithHead(PreTrainedModel):
 
         if self.name == 'google/gemma-2b':
             hidden_states = torch.stack(
-            [transformer_outputs[0][i, input_lens[i] - 1] for i in range(len(input_lens))]
+            [transformer_outputs[0][:, i, input_lens[i] - 1] for i in range(len(input_lens))]
             )
         else:
             hidden_states = torch.stack(
