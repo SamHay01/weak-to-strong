@@ -24,7 +24,7 @@ class TransformerWithHead(PreTrainedModel):
             lm = get_peft_model(lm, lora_config)
             
         self.lm = lm
-        if name == "google/Gemma-2b":
+        if name == "google/gemma-2b":
             self.transformer = lm.model.model.embed_tokens
             head_dtype = lm.lm_head.weight.dtype
         elif name=="google-bert/bert-base-cased":
