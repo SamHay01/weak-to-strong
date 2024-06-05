@@ -62,9 +62,9 @@ class TransformerWithHead(PreTrainedModel):
         Returns:
         HeadOutput: Output dataclass containing the logits.
         """
-        print(f'shape of input = {input_ids.shape}')
+        # print(f'shape of input = {input_ids.shape}')
         input_lens = (input_ids != 0).sum(dim=-1)
-        print(f'shape of input lens = {input_lens.shape}')
+
         transformer_outputs = self.transformer(input_ids)
         # print(f'output shape = {transformer_outputs.shape}')
 
@@ -76,9 +76,7 @@ class TransformerWithHead(PreTrainedModel):
             hidden_states = torch.stack(
                 [transformer_outputs[0][i, input_lens[i] - 1, :] for i in range(len(input_lens))]
             )
-        print(f'hidden_size = {self.hidden_size}')
-        print(f'shape of hidden states = {hidden_states.shape}')
-        assert False
+
         self.score.to(hidden_states.device)
         if self.linear_probe:
             hidden_states = hidden_states.detach()

@@ -99,6 +99,7 @@ def train_model(
 ):
     print("LR", lr, "batch_size", batch_size, "minibatch_size", minibatch_size)
     assert batch_size % minibatch_size == 0, "batch size must be divisible by minibatch size"
+    assert torch.cuda.is_available()
     # we purposefully turn off dropout, for determinism
     # this seems to help for 1 epoch finetuning anyways
     if train_with_dropout:
