@@ -66,7 +66,6 @@ class TransformerWithHead(PreTrainedModel):
         print(f'shape of input lens = {input_lens.shape}')
         transformer_outputs = self.transformer(input_ids)
         print(f'output shape = {transformer_outputs.shape}')
-        assert False
 
         if self.name == 'google/gemma-2b':
             hidden_states = torch.stack(
@@ -76,6 +75,8 @@ class TransformerWithHead(PreTrainedModel):
             hidden_states = torch.stack(
                 [transformer_outputs[0][i, input_lens[i] - 1, :] for i in range(len(input_lens))]
             )
+        print(f'shape of hidden states = {hidden_states.shape}')
+        assert False
         self.score.to(hidden_states.device)
         if self.linear_probe:
             hidden_states = hidden_states.detach()
