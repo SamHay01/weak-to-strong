@@ -180,6 +180,8 @@ def train_model(
         loss_tot += loss.item()
         loss.backward()
         losses.append(loss_tot)
+        print(loss)
+        assert not np.mean(losses).isnan()
         accuracies.append(
             torch.mean(
                 (torch.argmax(all_logits, dim=1) == torch.argmax(all_labels, dim=1)).to(
