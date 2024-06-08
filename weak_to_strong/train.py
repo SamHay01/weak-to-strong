@@ -176,12 +176,14 @@ def train_model(
             all_labels.extend(labels)
         all_logits = torch.stack(all_logits)
         all_labels = torch.stack(all_labels)
+        print(all_labels)
+        print(all_logits)
         loss = loss_fn(all_logits, all_labels, step_frac=step / nsteps)
         loss_tot += loss.item()
         loss.backward()
         losses.append(loss_tot)
         #print(loss)
-        #assert not np.mean(losses).isnan()
+        assert not np.mean(losses).isnan()
         accuracies.append(
             torch.mean(
                 (torch.argmax(all_logits, dim=1) == torch.argmax(all_labels, dim=1)).to(
